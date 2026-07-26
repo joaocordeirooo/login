@@ -26,7 +26,7 @@ app.use("/api/auth", authRoutes)
 
 app.get("/", (req, res) => {
     return res.status(200).json({
-        message: "Backend da aplicação de login está funcionando",
+        message: "um bj p gabi, a mais linda de fraiburgo",
     });
 });
 
