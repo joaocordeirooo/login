@@ -47,7 +47,7 @@ app.get("/api/database/test", async (req, res) => {
             mensagem: "não foi possível conectar ao pg",
             erro:
                 erro.mensage,
-                codig: erro.code
+                codigo: erro.code
                 //process.env.NODE_ENV === "development"
                 //? erro.message
                 //: undefined
