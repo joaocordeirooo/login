@@ -24,6 +24,36 @@ app.use(express.json());
 //rotas
 app.use("/api/auth", authRoutes)
 
+
+app.get("/api/database/test", async (req, res) => {
+    try{
+        const resultado = await pool.query(`
+            SELECT 
+                NOW() AS data_hora,
+                current_database() AS banco,
+                current_user AS usuario
+            `);
+        
+        res.status(200).json({
+            sucesso: true, 
+            mensagem: "Conexão com o PostgreSQL funcionando",
+            dados: resultado.rows[0]
+        });
+    } catch (erro) {
+        console.error("Erro ao testar bd: ", erro);
+
+        res.status(500).json({
+            sucesso: false, 
+            mensagem: "não foi possível conectar ao pg",
+            erro:
+                process.env.NODE_ENV === "development"
+                ? erro.message
+                : undefined
+        });
+    }
+})
+
+
 app.get("/", (req, res) => {
     return res.status(200).json({
         message: "um bj p gabi, a mais linda de fraiburgo",
