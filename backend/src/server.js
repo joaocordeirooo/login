@@ -46,9 +46,11 @@ app.get("/api/database/test", async (req, res) => {
             sucesso: false, 
             mensagem: "não foi possível conectar ao pg",
             erro:
-                process.env.NODE_ENV === "development"
-                ? erro.message
-                : undefined
+                erro.mensage,
+                codig: erro.code
+                //process.env.NODE_ENV === "development"
+                //? erro.message
+                //: undefined
         });
     }
 })
