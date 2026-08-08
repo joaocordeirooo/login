@@ -1,76 +1,114 @@
- import { useState } from "react";
+import Beams from "@/components/Beams/Beams"
+import Navbar from "@/components/Navbar/Navbar"
 
- function Login(){
-    const [email, setEmail] = useState("");
-    const [senha, setSenha] = useState("");
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
-    function handleLogin(event){
-        event.preventDefault();
+function Login() {
+  return (
+    <div className="relative min-h-screen w-full overflow-hidden">
 
-        console.log("email:", email); 
-        console.log("senha:", senha);
+      {/* BACKGROUND */}
+      <div className="absolute inset-0">
+        <Beams
+          beamWidth={2.9}
+          beamHeight={30}
+          beamNumber={20}
+          lightColor="#0732dc"
+          speed={2}
+          noiseIntensity={1.75}
+          scale={0.2}
+          rotation={30}
+        />
+      </div>
 
-        alert("login simulado com sucesso!")
-    }
-    return (
-        <div className="min-h-screen bg-zinc-900 flex items-center justify-center px-4">
-            <div className="w-full max-w-md bg-zinc-800 rounded-2x1 shadow-lg p-8">
-                <h1 className="text-3x1 font-bold text-white text-center mb-2">
-                
-                    Login
-                </h1>
+      {/* NAVBAR */}
+      <Navbar />
 
-                <p className="text-zinc-400 text-center mb-8">
-                    Acesse sua conta para continuar
-                </p>
+      {/* LOGIN */}
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-4 pt-24">
 
-                <form onSubmit={handleLogin} className="space-y-5">
-                    <div>
-                        <label className="block text-zinc-300 mb-2">
-                            E-mail
-                        </label>
+        <Card className="w-full max-w-sm border-white/20 bg-white/90 text-slate-900 shadow-2xl backdrop-blur-xl">
 
-                        <input
-                        type="email"
-                        placeholder="Digite seu e-mail"
-                        value={email}
-                        onChange={(event) => setEmail(event.target.value)}
-                        className="w-full px-4 py-3 rounded-lg bg-zinc-700 text-white outline-none border border-zinc-600 focus:border-blue-500"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-zinc-300 mb-2">
-                            Senha
-                        </label>
+          <CardHeader>
+            <CardTitle className="text-slate-900">
+              Entrar na sua conta
+            </CardTitle>
 
-                        <input
-                        type="password"
-                        placeholder="Digite sua senha"
-                        value={senha}
-                        onChange={(event) => setSenha(event.target.value)}
-                        className="w-full px-4 py-3 rounded-lg bg-zinc-700 text-white outline-none border border-zinc-600 focus:border-blue-500"
-                        />
-                    </div>
+            <CardDescription className="text-slate-600">
+              Informe seu e-mail e senha para continuar.
+            </CardDescription>
+          </CardHeader>
 
-                    <button
-                    type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition"
+          <CardContent>
+            <form>
+              <div className="flex flex-col gap-6">
+
+                {/* EMAIL */}
+                <div className="grid gap-2">
+                  <Label htmlFor="email">
+                    E-mail
+                  </Label>
+
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="seu@email.com"
+                    required
+                  />
+                </div>
+
+                {/* SENHA */}
+                <div className="grid gap-2">
+
+                  <div className="flex items-center">
+                    <Label htmlFor="password">
+                      Senha
+                    </Label>
+
+                    <a
+                      href="#"
+                      className="ml-auto text-sm text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline"
                     >
-                        Entrar
-                    </button>
-                </form>
+                      Esqueci minha senha
+                    </a>
+                  </div>
 
-                <p className="text-zinc-400 text-center mt-6 text-sm">
-                    Ainda não tem conta?{""}
-                    <span className="text-blue-400 text-center mt-6 text-sm">
-                        Cadastre-se
-                    </span>
-                </p>
-            </div>
-            
-        </div>
-    )
- }
+                  <Input
+                    id="password"
+                    type="password"
+                    required
+                  />
 
+                </div>
 
- export default Login;
+              </div>
+
+              {/* BOTÃO */}
+              <Button
+                type="submit"
+                className="mt-6 w-full"
+              >
+                Entrar
+              </Button>
+
+            </form>
+          </CardContent>
+
+        </Card>
+
+      </div>
+
+    </div>
+  )
+}
+
+export default Login
