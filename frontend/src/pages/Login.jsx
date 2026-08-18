@@ -1,114 +1,87 @@
-import Beams from "@/components/Beams/Beams"
-import Navbar from "@/components/Navbar/Navbar"
+import LoginForm from "../components/login/LoginForm";
 
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-
-function Login() {
+export default function Login() {
   return (
-    <div className="relative min-h-screen w-full overflow-hidden">
+     <main
+  className="
+    relative min-h-dvh
+    bg-cover bg-no-repeat
+    bg-position:30%_center
+    sm:bg-position:40%_center
+    lg:bg-center
+  "
+  style={{
+    backgroundImage: "url('/images/login-background.png')",
+  }}
+>
+  <div
+    className="
+      absolute inset-0
+      bg-white/35
+      sm:bg-white/20
+      lg:bg-transparent
+    "
+  />
 
-      {/* BACKGROUND */}
-      <div className="absolute inset-0">
-        <Beams
-          beamWidth={2.9}
-          beamHeight={30}
-          beamNumber={20}
-          lightColor="#0732dc"
-          speed={2}
-          noiseIntensity={1.75}
-          scale={0.2}
-          rotation={30}
-        />
+
+      {/* Conteúdo */}
+      <div
+        className="
+          relative z-10
+          flex min-h-screen
+          items-center justify-center
+          px-4 py-8
+
+          sm:px-8
+
+          lg:justify-end
+          lg:px-16
+
+          xl:px-28
+        "
+      >
+        <div className="flex w-full max-w-md flex-col items-center">
+          <header className="mb-7 text-center">
+            <h1 className="text-3xl font-bold tracking-tight text-zinc-950 sm:text-4xl">
+              FORENTIS.ADV
+            </h1>
+
+            <p className="mt-1 text-sm text-zinc-700">
+              Seu novo conceito de escritório
+            </p>
+          </header>
+
+          <section
+            className="
+              w-full
+              rounded-3xl
+              border border-white/60
+              bg-white/90
+              p-6
+              shadow-[0_20px_50px_rgba(0,0,0,0.28)]
+              backdrop-blur-md
+
+              sm:p-8
+            "
+          >
+            <div className="mb-7 text-center">
+              <h2 className="text-xl font-bold text-zinc-900">
+                Entrar na sua conta
+              </h2>
+
+              <p className="mt-2 text-sm text-zinc-500">
+                Informe seu e-mail e sua senha para continuar
+              </p>
+            </div>
+
+            <LoginForm />
+          </section>
+
+          <footer className="mt-8 text-center text-xs font-medium text-zinc-600">
+            © 2026 APLIQ TECNOLOGIA. Todos os direitos reservados.
+          </footer>
+        </div>
       </div>
-
-      {/* NAVBAR */}
-      <Navbar />
-
-      {/* LOGIN */}
-      <div className="relative z-10 flex min-h-screen items-center justify-center px-4 pt-24">
-
-        <Card className="w-full max-w-sm border-white/20 bg-white/90 text-slate-900 shadow-2xl backdrop-blur-xl">
-
-          <CardHeader>
-            <CardTitle className="text-slate-900">
-              Entrar na sua conta
-            </CardTitle>
-
-            <CardDescription className="text-slate-600">
-              Informe seu e-mail e senha para continuar.
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent>
-            <form>
-              <div className="flex flex-col gap-6">
-
-                {/* EMAIL */}
-                <div className="grid gap-2">
-                  <Label htmlFor="email">
-                    E-mail
-                  </Label>
-
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="seu@email.com"
-                    required
-                  />
-                </div>
-
-                {/* SENHA */}
-                <div className="grid gap-2">
-
-                  <div className="flex items-center">
-                    <Label htmlFor="password">
-                      Senha
-                    </Label>
-
-                    <a
-                      href="#"
-                      className="ml-auto text-sm text-slate-600 underline-offset-4 hover:text-slate-900 hover:underline"
-                    >
-                      Esqueci minha senha
-                    </a>
-                  </div>
-
-                  <Input
-                    id="password"
-                    type="password"
-                    required
-                  />
-
-                </div>
-
-              </div>
-
-              {/* BOTÃO */}
-              <Button
-                type="submit"
-                className="mt-6 w-full"
-              >
-                Entrar
-              </Button>
-
-            </form>
-          </CardContent>
-
-        </Card>
-
-      </div>
-
-    </div>
-  )
+    </main>
+  );
 }
-
-export default Login
