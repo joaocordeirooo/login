@@ -1,21 +1,68 @@
 import { useState } from "react";
 
 export default function LoginFOrm() {
+    
     const [email, setEmail] = useState(""); 
     const [senha, setSenha] = useState("");
     const [manterConectado, setManterConectado] = useState(false);
+    const [carregando, setCarregando] = useState(false);
+    const [erro, setErro] = useState("");
 
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-            const dadosLogin = {
-                email, 
-                senha, 
-                manterConectado
-            };
-        console.log(dadosLogin);
+        setCarregando(true);
+        setErro("")
 
-        //dps faço a rota de login
+        try{
+            const resposta = await fetch(
+                "http://localhost:3000/api/usuarios/login",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        email: email.trim().toLowerCase(),
+                        senha,
+                    }),
+                }
+            );
+
+            const resultado = await resposta.json(); 
+
+            if(!resposta.ok) {
+                throw new Error(
+                    resultado.message || "não foi possível realizar o login"
+                );
+            }
+
+            const token = resultado.token;
+            const usuario = resultado.usuario; 
+
+            if(!token) {
+                throw new Error("O servidor não retornou token de acesso.");
+            }
+
+            const armazenamento = manterConectado
+                ? localStorage
+                : sessionStorage;
+
+            armazenamento.setItem("token", token);
+            armazenamento.setItem(
+                "usuario",
+                JSON.stringify(usuario)
+            );
+
+            console.log("LOGIN REALIZADO COM SUCESSO!");
+            console.log("usuario autenticado: ", usuario);
+        } catch (erro) {
+            setErro(
+                erro.message || "Erro inesperado ao realizar login."
+            );
+        } finally {
+            setCarregando(false);
+        }
     };
 
     return (
@@ -47,7 +94,7 @@ export default function LoginFOrm() {
                     placeholder="seuemail@exemplo.com"
                     type="email"
                     value={email}
-                    onChangeCapture={(event) => setEmail(event.target.value)}
+                    onChange={(event) => setEmail(event.target.value)}
                 />
             </div>
 
@@ -100,7 +147,17 @@ export default function LoginFOrm() {
                 </a>
             </div>
 
+            {erro && (
+                <div
+                    className="rounded-lg border-red-200 bg-red-50 px-4 text-sm text-red-700"
+                    role="alert"
+                >
+                    {erro}
+                </div>
+            )}
+
             <button
+                disabled={carregando}
                 className="mt-4 w-full rounded-lg bg-blue-700
                 px-4 py-3 font-semibold text-white
                 transition
@@ -111,7 +168,7 @@ export default function LoginFOrm() {
 
                 type="submit"
             >
-                Entrar
+                {carregando ? "Entrando..." : "Entrar"}
             </button>
         </form>
     );
