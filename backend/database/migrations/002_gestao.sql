@@ -1,0 +1,7 @@
+CREATE TABLE clientes (id BIGSERIAL PRIMARY KEY, nome TEXT NOT NULL, cpf TEXT UNIQUE, dados JSONB NOT NULL DEFAULT '{}', criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(), atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE TABLE processos (id BIGSERIAL PRIMARY KEY, cliente_id BIGINT NOT NULL REFERENCES clientes(id), titulo TEXT NOT NULL, tipo TEXT NOT NULL, natureza TEXT NOT NULL DEFAULT 'Administrativo', numero TEXT, status TEXT NOT NULL DEFAULT 'Em análise', responsavel TEXT, descricao TEXT, criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(), atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE INDEX processos_cliente_idx ON processos(cliente_id);
+CREATE TABLE movimentacoes (id BIGSERIAL PRIMARY KEY, processo_id BIGINT NOT NULL REFERENCES processos(id), autor_id BIGINT NOT NULL REFERENCES usuarios(id), tipo TEXT NOT NULL, descricao TEXT NOT NULL, criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE INDEX movimentacoes_processo_idx ON movimentacoes(processo_id);
+CREATE TABLE tarefas (id BIGSERIAL PRIMARY KEY, processo_id BIGINT NOT NULL REFERENCES processos(id), titulo TEXT NOT NULL, responsavel TEXT, vencimento DATE NOT NULL, prioridade TEXT NOT NULL DEFAULT 'Normal', concluida BOOLEAN NOT NULL DEFAULT FALSE, criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE TABLE documentos (id BIGSERIAL PRIMARY KEY, processo_id BIGINT NOT NULL REFERENCES processos(id), autor_id BIGINT NOT NULL REFERENCES usuarios(id), nome TEXT NOT NULL, mime TEXT NOT NULL, conteudo BYTEA NOT NULL, criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW());

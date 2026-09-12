@@ -1,0 +1,10 @@
+{
+  "name": "forentis",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "npm --prefix frontend run build",
+    "migrate": "npm --prefix backend run migrate",
+    "test": "node --test backend/tests/integration.test.js"
+  }
+}

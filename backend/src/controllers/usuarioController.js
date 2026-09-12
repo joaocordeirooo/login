@@ -1,93 +1,42 @@
-import bcrypt from "bcrypt";
-import usuarioModel from "../model/usuarioModel.js";
-import jwtConfig from "../config/jwt.js"
-import jwt from "jsonwebtoken"
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import usuarioModel from '../model/usuarioModel.js';
+import jwtConfig from '../config/jwt.js';
+import { fail, required } from '../utils/validacao.js';
+
+function criarSessao(usuario) {
+  return {
+    usuario: { id: usuario.id, nome: usuario.nome, email: usuario.email, perfil: usuario.perfil },
+    token: jwt.sign({ id: usuario.id }, jwtConfig.secret, { expiresIn: jwtConfig.expiresIn }),
+  };
+}
+
+async function consultarConfiguracao(req, res) {
+  res.json({ necessario: !await usuarioModel.existeUsuario() });
+}
 
 async function cadastrarUsuario(req, res) {
-        try{
-            const {nome, email, senha, perfil} = req.body;
-            
-                if (!nome || !email || !senha) {
-                    return res.status(400).json({
-                        sucesso: false, 
-                        mensagem: "Nome, email e senha são obrigatórios",
-                    });
-                }
-        
-            const nomeLimpo = nome.trim(); //remover espaços
-            const emailNormalizado = email.trim().toLowerCase() //deixar o e-mail tudo minusculo
-
-                if (nomeLimpo.length < 3) {
-                    return res.status(400).json({
-                        sucesso: false, 
-                        mensagem: "O nome deve possuir pelo meno 3 caracteres",
-                    });
-                }
-
-                if (senha.length < 8) {
-                    return res.status(400).json({
-                        sucesso: false,
-                        mensagem: "A senha deve possuir pelo menos 8 caracteres.",
-                    })
-                }
-
-            const saltRounds = 12; 
-            const senhaHash = await bcrypt.hash(senha, saltRounds);
-
-            const novoUsuario = await usuarioModel.criarUsuario({
-                nome: nomeLimpo, 
-                email: emailNormalizado,
-                senhaHash, 
-                perfil,
-            });
-            
-            return res.status(201).json({
-                sucesso: true,
-                mensagem: "Usuario cadastrado com sucesso.",
-                usuario: novoUsuario,
-            })
-        } catch (erro) {
-            console.error("Erro ao cadastrar usuário: ", erro);
-         
-            if (erro.code === "23505"){
-                return res.status(409).json({
-                    sucesso: false, 
-                    mensagem: "Já existe um usuário cadastrado com esse e-mail",
-                });
-            }
-
-        return res.status(500).json({
-            sucesso: false,
-            mensagem: "Erro interno ao cadastraru usuário.",
-        })
-        }
+  const nome = required(req.body.nome, 'Nome', 150);
+  const email = required(req.body.email, 'E-mail', 255).toLowerCase();
+  const senha = required(req.body.senha, 'Senha', 72);
+  if (senha.length < 8 || !/^\S+@\S+\.\S+$/.test(email)) {
+    fail('Informe um e-mail válido e senha com pelo menos 8 caracteres.');
+  }
+  const senhaHash = await bcrypt.hash(senha, 12);
+  const usuario = await usuarioModel.criarPrimeiroUsuario({ nome, email, senhaHash });
+  res.status(201).json(criarSessao(usuario));
 }
 
 async function login(req, res) {
-    const {email, senha} = req.body;
-   
-    try{
-        const usuario = await usuarioModel.autenticarUsuario(email, senha);
+  const email = required(req.body.email, 'E-mail', 255).toLowerCase();
+  const senha = required(req.body.senha, 'Senha', 200);
+  const usuario = await usuarioModel.buscarPorEmail(email);
+  if (!usuario || !await bcrypt.compare(senha, usuario.senha_hash)) {
+    fail('E-mail ou senha inválidos.', 401);
+  }
+  res.json(criarSessao(usuario));
+}
 
-        const token = jwt.sign({ 
-            id: usuario.id, 
-            email: usuario.email, 
-            role: usuario.perfil},
-            jwtConfig.secret, {expiresIn: jwtConfig.expiresIn}
-        );
+function consultarSessao(req, res) { res.json(req.usuario); }
 
-        res.json({
-            message: 'login realizado',
-            token, 
-            usuario
-        });
-    } catch(err){
-        console.error(err);
-        res.status(err.status || 500).json({error: err.message || 'Erro ao realizar login'});
-    }
-};
-
-export default {
-    cadastrarUsuario,
-    login
-};
+export default { consultarConfiguracao, cadastrarUsuario, login, consultarSessao };

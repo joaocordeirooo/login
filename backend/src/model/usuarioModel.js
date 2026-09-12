@@ -1,71 +1,41 @@
-import pool from '../config/database.js'
-import bcrypt from 'bcrypt'
+import pool from '../config/database.js';
+import { fail } from '../utils/validacao.js';
 
-
-async function criarUsuario({nome, email, senhaHash, perfil = "usuario"}) {
-    const query = `
-        INSERT INTO usuarios (
-            nome, 
-            email,
-            senha_hash, 
-            perfil
-        )
-        VALUES ($1, $2, $3, $4)        
-        RETURNING 
-            id,
-            nome,
-            email,
-            perfil,
-            ativo,
-            criado_em,
-            atualizado_em
-        `;
-
-        const valores = [nome, email, senhaHash, perfil];
-
-        const resultado = await pool.query(query, valores);
-
-        return resultado.rows[0];
+async function existeUsuario() {
+  const resultado = await pool.query('SELECT 1 FROM usuarios LIMIT 1');
+  return resultado.rowCount > 0;
 }
 
-async function autenticarUsuario(email, senha) {
-        const query = `
-            SELECT id, nome, email, senha_hash, perfil FROM usuarios WHERE email = $1 AND ativo = true`;
-
-        const result = await pool.query(query, [email]);
-
-        if (result.rowCount === 0) {
-            throw{status: 401, 
-                message: 'Usuário não encontrado ou inativo'
-            };
-        }
-
-        const usuario = result.rows[0];
-
-        const senhaValida = await bcrypt.compare(
-            senha, 
-            usuario.senha_hash
-        );
-        if (!senhaValida){
-            throw {
-                status: 401, 
-                message: 'Senha Inválida'
-            };
-        }
-
-        return {
-            id: usuario.id,
-            nome: usuario.nome,
-            email: usuario.email,
-            perfil: usuario.perfil
-        }
-};
-
-
-
-export default {
-    criarUsuario,
-    autenticarUsuario
+async function buscarPorEmail(email) {
+  const resultado = await pool.query('SELECT * FROM usuarios WHERE email=$1 AND ativo=true', [email]);
+  return resultado.rows[0];
 }
 
+async function buscarAtivoPorId(id) {
+  const resultado = await pool.query('SELECT id,nome,email,perfil FROM usuarios WHERE id=$1 AND ativo=true', [id]);
+  return resultado.rows[0];
+}
 
+// A transação e o bloqueio impedem a criação simultânea de dois primeiros usuários.
+async function criarPrimeiroUsuario({ nome, email, senhaHash }) {
+  const conexao = await pool.connect();
+  try {
+    await conexao.query('BEGIN');
+    await conexao.query('LOCK TABLE usuarios IN EXCLUSIVE MODE');
+    const existentes = await conexao.query('SELECT 1 FROM usuarios LIMIT 1');
+    if (existentes.rowCount) fail('O escritório já foi configurado.', 403);
+    const resultado = await conexao.query(
+      "INSERT INTO usuarios(nome,email,senha_hash,perfil) VALUES($1,$2,$3,'admin') RETURNING *",
+      [nome, email, senhaHash],
+    );
+    await conexao.query('COMMIT');
+    return resultado.rows[0];
+  } catch (erro) {
+    await conexao.query('ROLLBACK');
+    throw erro;
+  } finally {
+    conexao.release();
+  }
+}
+
+export default { existeUsuario, buscarPorEmail, buscarAtivoPorId, criarPrimeiroUsuario };

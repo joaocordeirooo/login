@@ -1,0 +1,23 @@
+import { Router } from 'express';
+import authRoutes from './authRoutes.js';
+import usuarioRoutes from './usuarioRoutes.js';
+import clienteRoutes from './clienteRoutes.js';
+import processoRoutes from './processoRoutes.js';
+import movimentacaoRoutes from './movimentacaoRoutes.js';
+import tarefaRoutes from './tarefaRoutes.js';
+import documentoRoutes from './documentoRoutes.js';
+import usuarioController from '../controllers/usuarioController.js';
+import autenticar from '../middlewares/autenticar.js';
+
+const router = Router();
+router.get('/status', (req, res) => res.json({ online: true }));
+router.use(authRoutes);
+router.use('/usuarios', usuarioRoutes);
+router.use(autenticar);
+router.get('/me', usuarioController.consultarSessao);
+router.use(clienteRoutes);
+router.use(processoRoutes);
+router.use(movimentacaoRoutes);
+router.use(tarefaRoutes);
+router.use(documentoRoutes);
+export default router;

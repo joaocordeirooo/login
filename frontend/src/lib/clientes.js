@@ -1,0 +1,2 @@
+const groups = [['Dados pessoais', [['rg', 'RG'], ['nascimento', 'Data de nascimento', 'date'], ['nacionalidade', 'Nacionalidade'], ['estado_civil', 'Estado civil'], ['profissao', 'Profissão']]], ['Contato', [['email', 'E-mail', 'email'], ['telefone', 'Telefone'], ['whatsapp', 'WhatsApp']]], ['Endereço', [['cep', 'CEP'], ['logradouro', 'Logradouro'], ['numero', 'Número'], ['complemento', 'Complemento'], ['bairro', 'Bairro'], ['cidade', 'Cidade'], ['uf', 'UF']]]];
+export default groups;
