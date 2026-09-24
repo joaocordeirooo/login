@@ -13,7 +13,10 @@ function cliente(body) {
   return [nome, cpf || null, JSON.stringify(dados)];
 }
 async function listar(req, res) {
-  return res.json(await clienteModel.listar());
+  const pagina=Number(req.query.pagina || 1);
+  if (!Number.isSafeInteger(pagina) || pagina<1 || pagina>100000) fail('Página inválida.');
+  const result=await clienteModel.listar({q:String(req.query.q || '').slice(0,150),pagina,selecao:req.query.selecao==='1'});
+  return res.json(req.query.selecao==='1' || req.query.pagina ? result : result.items);
 }
 async function criar(req, res) {
   return res.status(201).json(await clienteModel.criar(cliente(req.body)));

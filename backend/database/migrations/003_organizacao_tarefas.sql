@@ -1,0 +1,11 @@
+CREATE TABLE setores (id BIGSERIAL PRIMARY KEY, nome VARCHAR(150) NOT NULL UNIQUE);
+CREATE TABLE fluxos (id BIGSERIAL PRIMARY KEY, setor_id BIGINT NOT NULL REFERENCES setores(id), nome VARCHAR(150) NOT NULL, UNIQUE(setor_id,nome), UNIQUE(id,setor_id));
+INSERT INTO setores(nome) VALUES ('Geral');
+INSERT INTO fluxos(setor_id,nome) SELECT id,'Atividades gerais' FROM setores WHERE nome='Geral';
+ALTER TABLE tarefas ADD COLUMN setor_id BIGINT REFERENCES setores(id), ADD COLUMN fluxo_id BIGINT, ADD COLUMN responsavel_id BIGINT REFERENCES usuarios(id), ADD COLUMN descricao TEXT NOT NULL DEFAULT '';
+UPDATE tarefas SET setor_id=s.id, fluxo_id=f.id FROM setores s JOIN fluxos f ON f.setor_id=s.id WHERE s.nome='Geral';
+ALTER TABLE tarefas ALTER COLUMN setor_id SET NOT NULL, ALTER COLUMN fluxo_id SET NOT NULL, ADD CONSTRAINT tarefa_fluxo_setor_fk FOREIGN KEY(fluxo_id,setor_id) REFERENCES fluxos(id,setor_id);
+CREATE INDEX tarefas_fluxo_idx ON tarefas(fluxo_id);
+CREATE TABLE tarefa_documentos (tarefa_id BIGINT NOT NULL REFERENCES tarefas(id) ON DELETE CASCADE, documento_id BIGINT NOT NULL REFERENCES documentos(id) ON DELETE CASCADE, PRIMARY KEY(tarefa_id,documento_id));
+CREATE TABLE solicitacoes_externas (id BIGSERIAL PRIMARY KEY, tarefa_id BIGINT NOT NULL REFERENCES tarefas(id) ON DELETE CASCADE, autor_id BIGINT NOT NULL REFERENCES usuarios(id), canal TEXT NOT NULL CHECK(canal IN ('Email','WhatsApp')), observacoes TEXT NOT NULL DEFAULT '', criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE TABLE solicitacao_documentos (solicitacao_id BIGINT NOT NULL REFERENCES solicitacoes_externas(id) ON DELETE CASCADE, documento_id BIGINT NOT NULL REFERENCES documentos(id), PRIMARY KEY(solicitacao_id,documento_id));

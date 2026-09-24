@@ -13,7 +13,7 @@ function ClientDetail() {
       id
     } = useParams(),
     state = useLoad('/clientes/' + id),
-    cases = useLoad('/processos'),
+    cases = useLoad('/processos?cliente_id='+id),
     [editing, setEditing] = useState(false);
   return <Loading state={state}>{state.data && <><Link className="back" to="/clientes"><ArrowLeft size={16} />Clientes</Link><Heading title={state.data.nome} subtitle={'Cliente desde ' + date(state.data.criado_em)}><button className="secondary" onClick={() => setEditing(!editing)}>{editing ? 'Voltar ao cadastro' : 'Editar cadastro'}</button></Heading>{editing ? <ClientForm key={id} initial={state.data} onCancel={() => setEditing(false)} onSaved={() => {
         setEditing(false);

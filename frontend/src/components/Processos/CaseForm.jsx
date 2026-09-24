@@ -11,7 +11,7 @@ function CaseForm({
   onSaved,
   onCancel
 }) {
-  const clients = useLoad('/clientes'),
+  const clients = useLoad('/clientes?selecao=1'),
     [search] = useSearchParams(),
     [form, setForm] = useState(initial || {
       cliente_id: search.get('cliente') || '',

@@ -1,7 +1,8 @@
 import pool from '../config/database.js';
 import { one } from './query.js';
-async function listar(valores) {
-  return (await pool.query('SELECT p.*,c.nome AS cliente FROM processos p JOIN clientes c ON c.id=p.cliente_id ORDER BY p.atualizado_em DESC', valores)).rows;
+async function listar(clienteId=null,selecao=false) {
+  const campos=selecao ? 'p.id,p.titulo,p.cliente_id,c.nome AS cliente' : 'p.id,p.cliente_id,p.titulo,p.tipo,p.natureza,p.numero,p.status,p.responsavel,p.atualizado_em,c.nome AS cliente';
+  return (await pool.query(`SELECT ${campos} FROM processos p JOIN clientes c ON c.id=p.cliente_id WHERE ($1::bigint IS NULL OR p.cliente_id=$1) ORDER BY p.atualizado_em DESC`,[clienteId])).rows;
 }
 async function criar(valores) {
   return one('INSERT INTO processos(cliente_id,titulo,tipo,natureza,numero,status,responsavel,descricao) VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *', valores);
