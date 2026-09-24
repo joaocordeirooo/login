@@ -11,7 +11,7 @@ app.use((req,res,next)=>{res.set('Cache-Control','no-store');res.set('X-Content-
 app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173' }));
 app.use(express.json({ limit: '15mb' }));
 app.use('/api', routes);
-if(process.env.NODE_ENV==='production'){
+if(process.env.NODE_ENV==='production' && process.env.SERVE_FRONTEND==='true'){
   const publicDir=fileURLToPath(new URL('../../frontend/dist/',import.meta.url));
   app.use(express.static(publicDir));
   app.get('/{*path}',(req,res,next)=>{

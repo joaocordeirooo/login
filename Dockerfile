@@ -6,7 +6,7 @@ COPY frontend/ ./
 RUN npm run build
 
 FROM node:24-bookworm-slim
-ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000
+ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000 SERVE_FRONTEND=true
 WORKDIR /app/backend
 COPY backend/package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
